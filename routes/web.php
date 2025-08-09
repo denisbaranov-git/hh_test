@@ -7,13 +7,13 @@ use App\Http\Controllers\DocumentController;
 
 Route::get('/', [DocumentController::class, 'index']);
 
-Route::get('/fetch/{count?}', [FetchController::class, 'fetch'])
-    ->where('count', '\d+')
-    ->name('fetch.data');
-
-Route::get('/fetch-command/{count?}', [FetchCommandController::class, 'fetch'])
+Route::get('/fetch1/{count?}', [FetchController::class, 'fetch'])
     ->where('count', '\d+')
     ->name('fetch.data1');
+
+Route::get('/fetch/{count?}', [FetchCommandController::class, 'fetch'])
+    ->where('count', '\d+')
+    ->name('fetch.data');
 
 Route::prefix('api')->group(function () {
     Route::get('/documents', [DocumentController::class, 'getDocuments']);
