@@ -8,36 +8,6 @@ class GoogleSheetsService
 {
     public function syncToSheet(string $spreadsheetId, $documents): void
     {
-//       $currentData = Sheets::spreadsheet($spreadsheetId)->sheet('Documents')->get()->toArray();
-//
-//        $headers = array_shift($currentData);
-//
-//        $comments = [];
-//        foreach ($currentData as $row) {
-//            if (count($row) > count($headers)) {
-//                $comments[$row[0]] = $row[count($headers)]; // ID => comments
-//            }
-//        }
-//
-//        $newData = [array_keys($items[0] ?? [])];
-//        foreach ($documents as $item) {
-//            $row = array_values($item);
-//            if (isset($comments[$item['id']])) {
-//                $row[] = $comments[$item['id']];
-//            }
-//            $newData[] = $row;
-//        }
-//
-//        Sheets::spreadsheet($spreadsheetId)
-//            ->sheet('Documents')
-//            ->clear();
-//
-//        Sheets::spreadsheet($spreadsheetId)
-//            ->sheet('Documents')
-//            ->append($newData);
-//
-//
-
         $sheets = Sheets::spreadsheet($spreadsheetId)->sheetList();
 
         $currentData = Sheets::spreadsheet($spreadsheetId)
@@ -76,8 +46,6 @@ class GoogleSheetsService
             ->sheet($sheets[0])
             ->update($newData);
     }
-
-
 
     public function getSheetData(int $count, $spreadsheetId): array
     {
