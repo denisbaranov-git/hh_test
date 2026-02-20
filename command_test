@@ -1,0 +1,29 @@
+composer require --dev phpstan/phpstan
+composer require --dev larastan/larast
+
+# Базовый запуск
+./vendor/bin/phpstan analyse
+
+# С подробным выводом
+./vendor/bin/phpstan analyse -v
+
+# Сохранение результата в файл
+./vendor/bin/phpstan analyse > phpstan-report.txt
+
+##########################
+composer require --dev squizlabs/php_codesniffer
+
+# Проверка кода
+./vendor/bin/phpcs
+
+# Автоматическое исправление
+./vendor/bin/phpcbf
+
+# Проверка конкретного файла
+./vendor/bin/phpcs app/Http/Controllers/UserController.php
+
+##########################
+bash
+# Создание теста
+php artisan make:test UserTest
+php artisan make:test UserControllerTest --unit

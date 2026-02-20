@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\GoogleSheetsService;
+use App\Contracts\SheetServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Symfony\Component\Process\Process;
@@ -12,7 +12,7 @@ class FetchController extends Controller
 {
     protected $sheetsService;
 
-    public function __construct(GoogleSheetsService $sheetsService)
+    public function __construct(SheetServiceInterface $sheetsService)
     {
         $this->sheetsService = $sheetsService;
     }

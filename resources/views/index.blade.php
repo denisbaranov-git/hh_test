@@ -144,13 +144,13 @@
                 isLoading.value = true;
                 try {
                     const response = await axios.get('/api/documents');
-                    documents.value = response.data.documents;
+                    documents.value = response.data.documents.data;
                     googleSheetUrlVal.value = response.data.googleSheetUrlVal;
+                    spreadsheetId.value = response.data.googleSheetId;
                 } catch (error) {
                     console.error(error);
                     alert('Ошибка получения документов');
-                }
-                finally {
+                } finally {
                     isLoading.value = false;
                 }
             };
@@ -221,7 +221,7 @@
                 if (!confirm('Сиинхронизация на google sheets?')) return;
 
                 try {
-                    await axios.get('/api/documents/sync-to-google');
+                    await axios.get('/api/documents/sync');
                     await fetchDocuments();
                     alert('Синхронизация OK!');
                 } catch (error) {
@@ -232,7 +232,7 @@
 
             const saveGoogleSheetUrl = async () => {
                 try {
-                    await axios.post('/api/documents/set-sheet-url', {'url':googleSheetUrlVal.value});
+                    await axios.post('/api/documents/set-url', {'url':googleSheetUrlVal.value});
                     //await fetchDocuments();
                 } catch (error) {
                     console.error(error);

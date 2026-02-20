@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\FetchCommandController;
+use App\Http\Controllers\GoogleSheetController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FetchController;
 use App\Http\Controllers\DocumentController;
@@ -16,13 +17,21 @@ Route::get('/fetch/{count?}', [FetchCommandController::class, 'fetch'])
     ->name('fetch.data');
 
 Route::prefix('api')->group(function () {
-    Route::get('/documents', [DocumentController::class, 'getDocuments']);
-    Route::post('/documents', [DocumentController::class, 'store']);
-    Route::put('/documents/{document}', [DocumentController::class, 'update']);
-    Route::delete('/documents/{document}', [DocumentController::class, 'destroy']);
-    Route::post('/documents/generate', [DocumentController::class, 'generate']);
-    Route::post('/documents/clear', [DocumentController::class, 'clear']);
-    Route::post('/documents/set-sheet-url', [DocumentController::class, 'setGoogleSheetUrl']);
+    // Документы
+    Route::prefix('documents')->group(function () {
 
-    Route::get('/documents/sync-to-google', [DocumentController::class, 'syncNow']);
+        Route::get('/', [DocumentController::class, 'getDocuments']);
+
+        Route::post('/', [DocumentController::class, 'store']);
+        Route::post('/generate', [DocumentController::class, 'generate']);
+        Route::post('/clear', [DocumentController::class, 'clear']);
+
+        Route::put('/{document}', [DocumentController::class, 'update']);
+        Route::delete('/{document}', [DocumentController::class, 'destroy']);
+    });
+
+    Route::prefix('google-sheet')->group(function () {
+        Route::post('/set-url', [GoogleSheetController::class, 'setUrl']);
+        Route::post('/sync', [GoogleSheetController::class, 'syncNow']);
+    });
 });

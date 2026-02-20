@@ -1,78 +1,96 @@
 <?php
+
 namespace App\Services;
 
+use App\Contracts\SheetServiceInterface;
 use Revolution\Google\Sheets\Facades\Sheets;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Exception;
 
-class GoogleSheetsService
+class GoogleSheetsService implements SheetServiceInterface
 {
-    public function syncToSheet(string $spreadsheetId, $documents): void
+    private const COMMENT_COLUMN_OFFSET = 1;
+
+    public function syncToSheet(string $spreadsheetId, array $documents): void
     {
-        $sheets = Sheets::spreadsheet($spreadsheetId)->sheetList();
+        try {
+            $sheet = $this->getFirstSheet($spreadsheetId);
+            $existingData = $sheet->get()->toArray();
 
-        $currentData = Sheets::spreadsheet($spreadsheetId)
-            ->sheet($sheets[0])
-            ->get()
-            ->toArray();
+            $comments = $this->extractComments($existingData);
+            $newData = $this->prepareSheetData($documents, $comments);
 
-        $headers = array_shift($currentData);
-        $commentColumnIndex = count($headers);
+            $sheet->update($newData);
 
-        $comments = [];
-        foreach ($currentData as $row) {
-            if (isset($row[0]) && count($row) > $commentColumnIndex) {
-                $comments[$row[0]] = $row[$commentColumnIndex];
-            }
+        } catch (Exception $e) {
+            Log::error('Failed to sync to Google Sheet: ' . $e->getMessage());
+            throw new Exception('Sync failed: ' . $e->getMessage());
         }
-        $documents[0]['comment'] = '';
-
-        $newData = [array_keys($documents[0] ?? [])];
-        //dd($documents);
-        foreach ($documents as $document) {
-            $row = array_values($document);
-            //$row[]= 'Комментарий';
-            if (isset($document['id']) && array_key_exists($document['id'], $comments)) {
-                $row[] = $comments[$document['id']];
-            } else {
-                $row[] = '';
-            }
-
-            $newData[] = $row;
-        }
-
-        $sheets = Sheets::spreadsheet($spreadsheetId)->sheetList();
-
-        Sheets::spreadsheet($spreadsheetId)
-            ->sheet($sheets[0])
-            ->update($newData);
     }
 
-    public function getSheetData(int $count, $spreadsheetId): array
+    public function getSheetData(int $count, string $spreadsheetId): array
     {
         if (empty($spreadsheetId)) {
             return [];
         }
 
         try {
-            $sheets = Sheets::spreadsheet($spreadsheetId)->sheetList();
-            $rows = Sheets::spreadsheet($spreadsheetId)
-                ->sheet($sheets[0])
-                ->get()->toArray();
+            $sheet = $this->getFirstSheet($spreadsheetId);
+            $rows = $sheet->get()->toArray();
 
-            $count = $count ?? count($rows);
-            $rows = array_slice($rows, 0, $count);
+            return array_slice($rows, 0, $count ?: count($rows));
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
+            Log::error('Failed to get sheet data: ' . $e->getMessage());
             return [];
         }
-        return $rows;
     }
 
-
-    public function extractSpreadsheetId($url)
+    public function extractSpreadsheetId(string $url): ?string
     {
         preg_match('/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/', $url, $matches);
         return $matches[1] ?? null;
     }
 
+    private function getFirstSheet(string $spreadsheetId)
+    {
+        $sheets = Sheets::spreadsheet($spreadsheetId)->sheetList();
+        return Sheets::spreadsheet($spreadsheetId)->sheet($sheets[0]);
+    }
+
+    private function extractComments(array $existingData): array
+    {
+        if (empty($existingData)) {
+            return [];
+        }
+
+        $headers = array_shift($existingData);
+        $commentColumnIndex = count($headers);
+        $comments = [];
+
+        foreach ($existingData as $row) {
+            if (isset($row[0]) && isset($row[$commentColumnIndex])) {
+                $comments[$row[0]] = $row[$commentColumnIndex];
+            }
+        }
+
+        return $comments;
+    }
+
+    private function prepareSheetData(array $documents, array $comments): array
+    {
+        if (empty($documents)) {
+            return [[]];
+        }
+
+        $newData = [array_keys($documents[0])];
+
+        foreach ($documents as $document) {
+            $row = array_values($document);
+            $row[] = $comments[$document['id']] ?? '';
+            $newData[] = $row;
+        }
+
+        return $newData;
+    }
 }
