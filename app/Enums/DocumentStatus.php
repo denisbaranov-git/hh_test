@@ -4,7 +4,7 @@ namespace App\Enums;
 
 enum DocumentStatus : string
 {
-    case Allowed = 'allowed';
+    case Allowed = 'Allowed';
     case Prohibited = 'Prohibited';
     public static function values(): array
     {

@@ -38,91 +38,91 @@
         <div class="spinner-border text-primary" style="width:3rem; height:3rem"></div>
     </div>
     <div :class="{'opacity-50': isLoading}">
-    <div class="row mb-4">
-        <div class="col">
-            <h1></h1>
-        </div>
-        <div class="col-auto">
-            <button @click="showCreateModal = true" class="btn btn-primary">Созать новый</button>
-            <button @click="generateDocuments" class="btn btn-success">Сгенерировать 1000</button>
-            <button @click="clearDocuments" class="btn btn-danger">Удалить все документы</button>
-        </div>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <div class="input-group">
-                <input type="text" class="form-control" v-model="googleSheetUrlVal" placeholder="Google Sheet URL">
-                <button @click="saveGoogleSheetUrl" class="btn btn-sm btn-warning">Set URL</button>
+        <div class="row mb-4">
+            <div class="col">
+                <h1></h1>
             </div>
-            <button @click="syncDocumentsToGoogle" class="btn btn-secondary w-max">Синхронизировать->Google sheet</button>
+            <div class="col-auto">
+                <button @click="showCreateModal = true" class="btn btn-primary">Созать новый</button>
+                <button @click="generateDocuments" class="btn btn-success">Сгенерировать 1000</button>
+                <button @click="clearDocuments" class="btn btn-danger">Удалить все документы</button>
+            </div>
         </div>
-        <a href="{{route('fetch.data',['count'=>'20'])}}">{{route('fetch.data')}} </a>
-    </div>
 
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="document in documents" :key="document.id">
-            <td>@{{ document.id }}</td>
-            <td>@{{ document.name }}</td>
-            <td>@{{ document.description }}</td>
-            <td>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <input type="text" class="form-control" v-model="googleSheetUrlVal" placeholder="Google Sheet URL">
+                    <button @click="saveGoogleSheetUrl" class="btn btn-sm btn-warning">Set URL</button>
+                </div>
+                <button @click="syncDocumentsToGoogle" class="btn btn-secondary w-max">Синхронизировать->Google sheet</button>
+            </div>
+            <a href="{{route('fetch.data',['count'=>'20'])}}">{{route('fetch.data')}} </a>
+        </div>
+
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="document in documents" :key="document.id">
+                <td>@{{ document.id }}</td>
+                <td>@{{ document.name }}</td>
+                <td>@{{ document.description }}</td>
+                <td>
                 <span :class="{'badge bg-success': document.status === 'Allowed', 'badge bg-danger': document.status === 'Prohibited'}">
                     @{{ document.status }}
                 </span>
-            </td>
-            <td>
-                <button @click="editDocument(document)" class="btn btn-sm btn-warning">Edit</button>
-                <button @click="deleteDocument(document.id)" class="btn btn-sm btn-danger">Delete</button>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+                </td>
+                <td>
+                    <button @click="editDocument(document)" class="btn btn-sm btn-warning">Edit</button>
+                    <button @click="deleteDocument(document.id)" class="btn btn-sm btn-danger">Delete</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
-    <!-- Create/Edit Modal -->
-    <div class="modal fade" :class="{show: showCreateModal}" tabindex="-1" style="display: block;" v-if="showCreateModal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">@{{ editingDocument.id ? 'Редактировать' : 'Создать' }}</h5>
-                    <button type="button" class="btn-close" @click="showCreateModal = false"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="name" v-model="editingDocument.name">
+        <!-- Create/Edit Modal -->
+        <div class="modal fade" :class="{show: showCreateModal}" tabindex="-1" style="display: block;" v-if="showCreateModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">@{{ editingDocument.id ? 'Редактировать' : 'Создать' }}</h5>
+                        <button type="button" class="btn-close" @click="showCreateModal = false"></button>
                     </div>
-                    <div class="mb-3">
-                        <label for="description" class="form-label">Description</label>
-                        <input type="text" class="form-control" id="description" v-model="editingDocument.description">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" v-model="editingDocument.name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <input type="text" class="form-control" id="description" v-model="editingDocument.description">
+                        </div>
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" v-model="editingDocument.status">
+                                <option value="Allowed">Allowed</option>
+                                <option value="Prohibited">Prohibited</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="status" class="form-label">Status</label>
-                        <select class="form-select" id="status" v-model="editingDocument.status">
-                            <option value="Allowed">Allowed</option>
-                            <option value="Prohibited">Prohibited</option>
-                        </select>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="showCreateModal = false">Close</button>
+                        <button type="button" class="btn btn-primary" @click="saveDocument">Save</button>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @click="showCreateModal = false">Close</button>
-                    <button type="button" class="btn btn-primary" @click="saveDocument">Save</button>
                 </div>
             </div>
         </div>
+        <div class="modal-backdrop fade" :class="{show: showCreateModal}" v-if="showCreateModal"></div>
     </div>
-    <div class="modal-backdrop fade" :class="{show: showCreateModal}" v-if="showCreateModal"></div>
-        </div>
-    </div>
+</div>
 
 <script>
     const { createApp, ref, onMounted } = Vue;
@@ -144,13 +144,13 @@
                 isLoading.value = true;
                 try {
                     const response = await axios.get('/api/documents');
-                    documents.value = response.data.documents.data;
+                    documents.value = response.data.documents;
                     googleSheetUrlVal.value = response.data.googleSheetUrlVal;
-                    spreadsheetId.value = response.data.googleSheetId;
                 } catch (error) {
                     console.error(error);
                     alert('Ошибка получения документов');
-                } finally {
+                }
+                finally {
                     isLoading.value = false;
                 }
             };
@@ -221,7 +221,7 @@
                 if (!confirm('Сиинхронизация на google sheets?')) return;
 
                 try {
-                    await axios.get('/api/documents/sync');
+                    await axios.get('/api/google-sheet/sync');
                     await fetchDocuments();
                     alert('Синхронизация OK!');
                 } catch (error) {
@@ -232,7 +232,7 @@
 
             const saveGoogleSheetUrl = async () => {
                 try {
-                    await axios.post('/api/documents/set-url', {'url':googleSheetUrlVal.value});
+                    await axios.post('/api/google-sheet/set-url', {'url':googleSheetUrlVal.value});
                     //await fetchDocuments();
                 } catch (error) {
                     console.error(error);

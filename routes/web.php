@@ -32,6 +32,6 @@ Route::prefix('api')->group(function () {
 
     Route::prefix('google-sheet')->group(function () {
         Route::post('/set-url', [GoogleSheetController::class, 'setUrl']);
-        Route::post('/sync', [GoogleSheetController::class, 'syncNow']);
+        Route::get('/sync', [GoogleSheetController::class, 'syncNow']);
     });
 });

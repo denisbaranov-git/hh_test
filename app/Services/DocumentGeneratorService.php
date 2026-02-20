@@ -26,7 +26,6 @@ class DocumentGeneratorService
                 'updated_at' => now(),
             ];
         }
-
-        Document::insert($items);
+            Document::insert($items);
     }
 }
