@@ -36,7 +36,7 @@ return [
     | a Server key, and not a Browser key.
     |
     */
-    'developer_key' => env('GOOGLE_DEVELOPER_KEY', 'AIzaSyBiDBhPN32r8mKQXiSisZO4Re7E4El3VYU'),
+    'developer_key' => env('GOOGLE_DEVELOPER_KEY', ''),
     //'developer_key' => env('GOOGLE_DEVELOPER_KEY', ''),
     /*
     |----------------------------------------------------------------------------
@@ -57,8 +57,6 @@ return [
          * Path to service account json file. You can also pass the credentials as an array
          * instead of a file path.
          */
-        //'file' => env('GOOGLE_SERVICE_ACCOUNT_JSON_LOCATION', ''),
-        //'file' => storage_path('client_secret_619397781725-pj75l0475lbcl9s0knqqtrm7o4fibe0d.apps.googleusercontent.com.json'),
         'file' => storage_path('app/hh-test-468321-a4d69ed1bab1.json'),
     ],
 
